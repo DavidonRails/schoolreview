@@ -1,0 +1,5 @@
+<% @programs.each do |program| %>
+<li><%= link_to "#{program.title}", institution_program_path(@institution, program) %></li>
+<hr>
+<% end %>
+<%= paginate @programs %>

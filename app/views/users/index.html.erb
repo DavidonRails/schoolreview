@@ -1,0 +1,437 @@
+<div class="row" id="user-index-show"></div>
+<div class="row" id="user-index-reviews">
+  <% if @reviews %>
+    <% @reviews.each do |review| %>
+      <div class="posts-feed-item row centered">
+        <div class="small-1 medium-1 large-1 columns">
+          <ul>
+            <li>
+              <% if review.user.profile_photo.file %>
+                <p><%= image_tag review.user.profile_photo %></p>
+              <% else %>
+                <p><%= image_tag "default-profile.png" %></p>
+              <% end %>
+            </li>
+            <li id="up-arrow-<%= review.id %>">
+              <%= link_to like_institution_program_review_path(review.institution, review.program, review), class: "upvote_review",
+               review: review.id, rating: review.rating,
+               institution: review.institution.id do %>
+                <i class="fi-arrow-up"></i>
+              <% end  %>
+            </li>
+            <li class="votetext update-rating-<%= review.id %>"><%= review.score %></li>
+            <li id="down-arrow-<%= review.id %>">
+              <%= link_to dislike_institution_program_review_path(review.institution, review.program, review), class: "downvote_review",
+               review: review.id, rating: review.rating,
+               institution: review.institution.id do%>
+                 <i class="fi-arrow-down"></i>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+
+        <div class="small-10 medium-10 large-10 columns">
+          <div class="program target row">
+            <div class="large-8 columns">
+              <ul>
+                <li>
+                  Institution: <%= link_to "#{review.institution.name}", institution_path(review.institution) %>
+                </li>
+                <li>
+                  Program: <%= link_to "#{review.program.title}", institution_program_path(review.institution, review.program) %>
+                </li>
+              </ul>
+            </div>
+            <div class="large-4 columns">
+              <ul>
+                <li>
+                  Created from: <%= distance_of_time_in_words(Time.now, review.created_at) %> ago
+                </li>
+                <li>
+                  By: <%= link_to review.user.first_name, user_path(review.user) %>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="title row">
+            <div class="large-10 columns">
+              <%= link_to "#{review.title}", institution_program_review_path(review.institution, review.program, review) %>
+            </div>
+            <div class="large-2 columns">
+              Rating: <%= review.rating %>
+            </div>
+          </div>
+          <div class="review content row">
+            <%= raw review.content %>
+          </div>
+          <div class="row">
+            <ul class="small-12 columns small button-group">
+              <% if review.access_privilege(current_user) %>
+                <li>
+                  <%= link_to 'Details', institution_program_review_path(review.institution, review.program, review), class: 'button small' %>
+                </li>
+                <li>
+                  <%= link_to 'edit',
+                  edit_institution_program_review_path(review.institution, review.program, review), class: 'button small' %>
+                </li>
+                <li>
+                  <%= link_to 'Delete',
+                  edit_institution_program_review_path(review.institution, review.program, review), method: :delete, class: 'button alert small' %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+        <div class="small-10 medium-10 large-1 columns"></div>
+      </div>
+      <hr>
+    <% end %>
+    <%= paginate @reviews %>
+  <% end %>
+</div>
+
+<div class="video_gallery slider-wrapper">
+    <% if @webinars.length != 0 %>
+      <div class="slider slider1">
+          <% @webinars.each_with_index do |webinar, index| %>
+          <div>
+              <div>
+                <h4><%= webinar.name %></h4>
+                <video width="320" height="240" controls>
+                  <source src="<%= webinar.filepath %>" type="video/mp4">
+                  <source src="<%= webinar.filepath %>" type="video/ogg">
+                  <!--source src="/assets/Big_Buck_Bunny.mp4" type="video/mp4">
+                  <source src="/assets/Big_Buck_Bunny.ogg" type="video/ogg"-->
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+
+              <div class="paticipants_box">
+                <% @paticipants_list[index].each_with_index do |pat, index| %>
+                  <% if pat[0] %>
+                    <span class="col-lg-3 pat_box">
+                      <div class="box_content">
+                        <div class="pat_avatar"><img src="<%= pat[0].profile_photo %>" width="60" height="80" /></div>
+                        <div class="pat_username"><%= pat[0].first_name << " " << pat[0].last_name %></div>
+                        <div class="pat_email"><%= pat[0].email %></div>
+
+                        <% if pat[0].id != current_user.id %>
+                        <div class="pat_msg" qb_id="<%= pat[0].qb_id %>" qb_email="<%= pat[0].email %>" qb_name="<%= pat[0].first_name %>" >leave a message</div>
+                        <% end %>
+                        
+                      </div>
+                    </span>
+                  <% end %>
+                <% end %>
+              </div>
+          </div>
+
+          <% end %>
+      </div>
+    <% end %>
+
+</div>
+
+<div class="row" id="user_index_search">
+    <h2><center>User Search</center></h2>
+
+    <% if current_user %>
+      <%= javascript_tag do %>
+        window.current_user_qb_id = '<%= current_user.qb_id %>'
+        window.current_user_email = '<%= current_user.email %>'
+        window.current_user_name = '<%= current_user.first_name << " " << current_user.last_name %>'
+      <% end %>
+    <% end %> 
+
+    <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+        <li class="active"><a href="#institution" data-toggle="tab">Institution Program</a></li>
+        <li><a href="#name" data-toggle="tab">Username</a></li>
+        <li><a href="#location" data-toggle="tab">Location</a></li>
+        <li><a href="#description" data-toggle="tab">Description</a></li>
+    </ul>
+    <div id="user-search-tab-content" class="tab-content">
+        <div class="tab-pane active" id="institution">
+          <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+              <div class="input-group">
+                <!--input type="text"  placeholder="Institution Program for User Search..."-->
+                <select class="institution_search_word">
+                  <% @programs_list.each do |program| %>
+
+                    <optgroup label="<%= program[:name] %>">
+                    <% program[:data].each do |p| %>
+                      <option><%= p %></option>
+                    <% end %>
+                    </optgroup>
+                  <% end %>
+                </select>
+
+                <span class="input-group-btn">
+                  <button class="btn btn-default institution_search_btn" type="button">Go!</button>
+                </span>
+              </div><!-- /input-group -->
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="name">
+          <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+              <div role="alert" class="alert alert-danger alert-name-search" style="display: none;">
+                <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span><span class="sr-only">Error:</span>   Please input name for user search!
+              </div>
+
+              <div class="input-group">
+                <input type="text" class="username_search_word" placeholder="Search by User name...">
+                <span class="input-group-btn">
+                  <button class="btn btn-default username_search_btn" type="button">Go!</button>
+                </span>
+              </div><!-- /input-group -->
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="location">
+          <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+              <div role="alert" class="alert alert-danger alert-location-search" style="display: none;">
+                <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span><span class="sr-only">Error:</span>   Please input location for user search!
+              </div>
+
+              <div class="input-group">
+                <input type="text" class="location_search_word" placeholder="Location for User Search...">
+                <span class="input-group-btn">
+                  <button class="btn btn-default location_search_btn" type="button">Go!</button>
+                </span>
+              </div><!-- /input-group -->
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="description">
+          <div class="row">
+            <div class="col-lg-10 col-lg-offset-1">
+              <div role="alert" class="alert alert-danger alert-desc-search" style="display: none;">
+                <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span><span class="sr-only">Error:</span>   Please input description for user search!
+              </div>
+
+              <div class="input-group">
+                <input type="text" class="description_search_word" placeholder="Description for User Search...">
+                <span class="input-group-btn">
+                  <button class="btn btn-default description_search_btn" type="button">Go!</button>
+                </span>
+              </div><!-- /input-group -->
+            </div>
+          </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="user_search_list col-lg-10 col-lg-offset-1" style="display:none;">
+    <div class="user_search_table">
+
+        <div class="panel search_item_panel">
+          <div class="panel-heading clickable panel-collapsed">
+            <div class="col-md-3 user_name">Mikael Kofoed</div>
+            <div class="col-md-3 user_major">Math</div>
+            <div class="col-md-3 user_loc ation">Copenhagen, Denmark</div>
+            <div class="col-md-3 user_action">
+              <span class="like_btn unlike"></span>
+              <span class="down_arrow arrow_span"></span>
+            </div>
+          </div>
+          <div class="panel-body" style="display:none;">
+            <div class="col-md-4">
+
+              <div class="col-md-6">
+                <p>Personal Description:</p>
+                <img class="user_avatar" src="default-profile.png" width="80" height="100">
+              </div>
+
+              <div class="col-md-6 user_desc">
+                  Born in a southeast city in Zhejiang, China
+              </div>
+
+            </div>
+
+            <div class="col-md-8 user_institutions">
+              <div class="col-md-8 user_program_lists">
+                <div class="institution_row">
+                  <p>Institution: Brown unityversity</p>
+                  <p>Program: PRMICG(Master of Science)</p>
+                  <p>Duration: August 2014 - May 2015</p>
+                </div>
+
+                <div class="institution_row">
+                  <p>Institution: Harvard unityversity</p>
+                  <p>Program: Supply Chain Management(Bachelor of Art)</p>
+                  <p>Duration: August 2014 - June 2015</p>
+                </div>
+
+                <div class="institution_row">
+                  <p>Institution: Brown unityversity</p>
+                  <p>Program: PRMICG(Master of Science)</p>
+                  <p>Duration: August 2014 - May 2015</p>
+                </div>
+
+                <div class="institution_row">
+                  <p>Institution: Harvard unityversity</p>
+                  <p>Program: Supply Chain Management(Bachelor of Art)</p>
+                  <p>Duration: August 2014 - June 2015</p>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <span class="call_btn" onclick="video_call();"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row user_lits">
+  <% @users.each do |user| %>
+    <li>
+      <%= link_to "#{user.first_name} #{user.last_name}", user_path(user) %>
+    </li>
+  <% end %>
+  <%= paginate @users %>
+</div>
+
+<!-- Chat Modal -->
+<div id="chatDlg" class="modal fade" role="dialog">
+
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Send message to</h4>
+      </div>
+
+      <div class="modal-body">
+        <div class="input-group income_box" style="display:block;">
+            
+            <h4 class="income_user"></h4>
+            <div class="messages_list pre-scrollable">
+
+                <!--div id="1" class="list-group-item">
+
+                  <span class="pull-left"><name>Mike Floyd</name></span>
+                  <time class="pull-right" datetime="Fri Dec 18 2015 10:36:29 GMT+0100 (CET)">about an hour ago</time>
+                  <p class="list-group-item-text">test</p>
+                
+                </div-->
+                
+            </div>
+
+            <div>
+              <img class="load-msg" src="/assets/loading.gif" />
+            </div>
+
+        </div>
+
+        <div class="alert alert-danger chat_dlg_error" style="display:none;">
+          <strong>Sorry!</strong> Occupants with these IDs do not exist in system.
+        </div>
+
+
+        <br />
+        
+        <div class="input-group send_box">
+            <textarea class="form-control msg_text" rows="2" style="resize:none"></textarea>
+            <span class="input-group-addon btn btn-primary msg_send_btn">Send</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Video Call Modal -->
+
+<!-- Incoming Video Call Modal -->
+<div id="incomingCall" class="modal fade" role="dialog">
+
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Incoming Video Conference</h4>
+      </div>
+
+      <div class="modal-body">
+          <div class="incoming-call-controls l-flexbox l-flexbox_flexcenter">
+            <button id="reject" class="btn btn-default btn_decline">Decline</button>
+            <button id="accept" class="btn btn-default btn_accept">Accept</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Video Call Modal -->
+<div id="video_conf_modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Video Conference</CENTER></h4>
+      </div>
+
+      <div class="modal-body">
+        <section class="chat center">
+
+          <div class="streams">
+            <div class="localControls">
+              <span id="callerName"></span><br>
+              <video id="localVideo"></video>
+              <div class="mediacall-controls l-flexbox l-flexbox_flexcenter">
+                <button class="btn_mediacall btn_camera_off" data-action="mute"><img class="btn-icon_mediacall" src="icon-camera-off.png" alt="camera"></button>
+                <button class="btn_mediacall btn_mic_off" data-action="mute"><img class="btn-icon_mediacall" src="icon-mic-off.png" alt="mic"></button>
+              </div>
+            </div>
+            <div class="remoteControls">
+              <span id="calleeName"></span><br>
+              <video id="remoteVideo"></video>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+
+      <div class="modal-footer">
+        <div class="controls">
+          <button id="hangup" type="button" class="btn btn-default">
+            <img class="icon-hangup" src="icon-hangup.png" alt="">Hangup
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<audio id="callingSignal" loop>
+  <source src="audio/calling.ogg"></source>
+  <source src="audio/calling.mp3"></source>
+</audio>
+
+<audio id="ringtoneSignal" loop>
+  <source src="audio/ringtone.ogg"></source>
+  <source src="audio/ringtone.mp3"></source>
+</audio>
+
+<audio id="endCallSignal">
+  <source src="audio/end_of_call.ogg"></source>
+  <source src="audio/end_of_call.mp3"></source>
+</audio>
+
+

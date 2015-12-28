@@ -1,0 +1,11 @@
+<h3><%= @institution.name %></h3>
+
+<%= render 'review' %>
+
+<hr>
+<ul class="small-8 columns button-group">
+  <li>
+    <%= link_to 'Back', institution_path(@institution), class: 'button' %>
+    <%= link_to 'Add a review', new_institution_program_review_path(@institution, @program) %>
+  </li>
+</ul>

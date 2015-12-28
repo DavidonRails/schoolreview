@@ -1,0 +1,12 @@
+<%= form_for [@institution, @program, @review] do |f| %>
+  <%= f.label :title %>
+  <%= f.text_field :title, placeholder: 'Please write down the theme of your review.' %>
+
+  <%= f.label :content %>
+  <%= f.text_area :content %>
+
+  <%= f.label :rating %>
+  <%= f.text_field :rating, placeholder: 'Please enter the number between 0-10.(10 being the best)' %>
+
+  <%= f.submit %>
+<% end %>

@@ -1,0 +1,247 @@
+<div class="large-12 large-centered columns content-box row" id="content-box">
+  <div class="row user-info-section">
+    <div class="medium-3 large-3 columns">
+      <% if @user.profile_photo.file %>
+        <p><%= image_tag @user.profile_photo %></p>
+      <% else %>
+        <p><%= image_tag "default-profile.png", width: 128, height: 128 %></p>
+      <% end %>
+      <p><b><%= @user.first_name if @user.first_name %> <%= @user.last_name if @user.last_name %></b></p>
+      <p><%= @user.location if @user.location %></p>
+
+      <% if @user.access_privilege(current_user) %>
+        <ul class="stack button-group radius">
+          <li><%= link_to "Edit Information", edit_user_path(@user), class: 'tiny button radius' %></li>
+          <% if @user.check_admin(current_user) %>
+          <li><%= link_to "Delete Account", user_path(@user), method: :delete, class: 'tiny button radius' %></li>
+          <% end %>
+          <li><%= link_to "Organize programs", user_program_attendancies_path, class: 'tiny button radius' %></li>
+          <li><%= link_to "Create Webinar", webinars_path, class: 'tiny button radius' %></li>
+        </ul>
+      <% end %>
+    </div>
+
+    <div class="medium-6 large-6 columns" id="content-middle">
+      <div class="row" id="container-user-skill-columns"></div>
+      <p id="content-middle-self-intro-title"><%= @user.first_name if @user.first_name %>'s center:</p>
+      <div class="row" id="user_show">
+        <% if @user.description %>
+          <%= truncate(@user.description,
+                       length: 300,
+                       escape: false){
+                       link_to 'More', '#', id: "user_profile_intro"
+                       } %>
+        <% else %>
+        <p>
+          He did\'t leave anything.
+        </p>
+        <% end %>
+      </div>
+      <% if @skills %>
+        <div class="row">
+          <p>
+            Skills:
+            <% @skills.each do |skill| %>
+              <span data-tooltip aria-haspopup="true" class="has-tip" title="<%= skill.name %>">
+                <% if(skill.category) %>
+                  <i class="<%= skill.category.icons %>"></i>
+                <% end %>
+              </span>
+            <% end %>
+          </p>
+        </div>
+      <% else %>
+        Get some new skills!
+      <% end %>
+    </div>
+
+    <div class="medium-3 large-3 columns" id="user_progress">
+      <% if @programs %>
+        <p><%= @user.first_name if @user.first_name %>'s programs:</p>
+        <div class="row program-learned">
+          <ul>
+            <li class="progress-title">Programs finished:</li>
+            <% if @programs_finished %>
+              <% @programs_finished.each do |user_program_attendancy| %>
+                <li><%= user_program_attendancy.program.title %></li>
+              <% end %>
+            <% else %>
+              <li>nothing here.</li>
+            <%end %>
+
+            <li class="progress-title">Programs in-progress:</li>
+            <% if @programs_inprogress %>
+              <% @programs_inprogress.each do |user_program_attendancy| %>
+                <li><%= user_program_attendancy.program.title %></li>
+                <div class="progress small-12 large-12
+                  secondary alert radius round" style="inline">
+                  <span class="meter"
+                        style="width: <%= (Date.today - user_program_attendancy.start_date)/
+                        ((user_program_attendancy.end_date -
+                        user_program_attendancy.start_date).to_f)*100.round(0) %>%">
+                        <p class="percent"><%= ((Date.today -
+                         user_program_attendancy.start_date)/
+                         ((user_program_attendancy.end_date -
+                         user_program_attendancy.start_date).to_f)*100).round %>%</p></span>
+                </div>
+              <% end %>
+            <% else %>
+              <li>nothing here.</li>
+            <% end %>
+
+            <li class="progress-title">Programs planned:</li>
+            <% if @programs_planning %>
+              <% @programs_planning.each do |user_program_attendancy| %>
+                <li><%= user_program_attendancy.program.title %></li>
+              <% end %>
+            <% else %>
+              <li>nothing here.</li>
+            <% end %>
+          </ul>
+        </div>
+      <% else %>
+        Get some new skills!
+      <% end %>
+    </div>
+  </div>
+  <hr>
+  <div class="row timeline" id="timeline-embed" style="min-height: 400px;"></div>
+
+<!-- the following section is for skill-planner -->
+  <hr>
+  <div class="row">
+    <div class="large-7 columns" id="container-user-skill-webmap"></div>
+    <% if @user.access_privilege(current_user) %>
+      <div class="large-5 columns skill-planner">
+        <ul class="accordion" data-accordion>
+          <li class="accordion-navigation">
+            <a href="#panel1a">Add a skill</a>
+            <div id="panel1a" class="content active">
+              <%= render 'skills/form' %>
+            </div>
+          </li>
+          <li class="accordion-navigation">
+            <a href="#panel2a">Add a program</a>
+            <div id="panel2a" class="content">
+              <%= form_for @user_program_attendancy do |f| %>
+                <%= f.label :'Choose an institution' %>
+                <%= f.collection_select(:location, Institution.all, :id, :name, prompt: true) %>
+                <%= f.label :'Choose an program' %>
+                <%= f.collection_select(:program_id, Program.all, :id, :title, prompt: true) %>
+                <!-- set up a hard-coded select box with ONE empty option that says "Select an instutution above" -->
+                <div class="large-12 columns">
+                  <div class="large-6 columns">
+                    <%= f.label :'select start date' %>
+                    <%= date_select :user_program_attendancy, :start_date %>
+                  </div>
+
+                  <div class="large-6 columns">
+                    <%= f.label :'select end date' %>
+                    <%= date_select :user_program_attendancy, :end_date %>
+                  </div>
+                </div>
+
+                <%= f.label :'please provide an image or video url' %>
+                <%= f.text_field :url, placeholder: "provide an image or video link!" %>
+
+                <%= f.submit 'Add your program', class: 'button tiny' =%>
+              <% end %>
+            </div>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+  <!-- skill-planner section ends here -->
+  <hr>
+
+  <!--  User's post section -->
+  <% if @reviews %><h4><%= @user.first_name %>'s Posts</h4><% end %>
+  <% if @reviews %>
+    <% @reviews.each do |review| %>
+      <div class="posts-feed-item row centered">
+        <div class="small-1 medium-1 large-1 columns">
+          <ul>
+            <li>
+              <% if @user.profile_photo.file %>
+                <p><%= image_tag @user.profile_photo %></p>
+              <% else %>
+                <p><%= image_tag "default-profile.png" %></p>
+              <% end %>
+            </li>
+            <li id="up-arrow-<%= review.id %>">
+              <%= link_to like_institution_program_review_path(review.institution, review.program, review), class: "upvote_review",
+               review: review.id, rating: review.rating,
+               institution: review.institution.id do %>
+                <i class="fi-arrow-up"></i>
+              <% end  %>
+            </li>
+            <li class="votetext update-rating-<%= review.id %>"><%= review.score %></li>
+            <li id="down-arrow-<%= review.id %>">
+              <%= link_to dislike_institution_program_review_path(review.institution, review.program, review), class: "downvote_review",
+               review: review.id, rating: review.rating,
+               institution: review.institution.id do%>
+                 <i class="fi-arrow-down"></i>
+               <% end %>
+            </li>
+          </ul>
+        </div>
+
+        <div class="small-10 medium-10 large-10 columns">
+          <div class="program target row">
+            <div class="large-8 columns">
+              <ul>
+                <li>
+                  Institution: <%= link_to "#{review.institution.name}", institution_path(review.institution) %>
+                </li>
+                <li>
+                  Program: <%= link_to "#{review.program.title}", institution_program_path(review.institution, review.program) %>
+                </li>
+              </ul>
+            </div>
+            <div class="large-4 columns">
+              <ul>
+                <li>
+                  Created from: <%= distance_of_time_in_words(Time.now, review.created_at) %> ago
+                </li>
+                <li>
+                  By: <%= @user.first_name %>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="title row">
+            <div class="large-10 columns">
+              <%= link_to "#{review.title}", institution_program_review_path(review.institution, review.program, review) %>
+            </div>
+            <div class="large-2 columns">
+              Rating: <%= review.rating %>
+            </div>
+          </div>
+          <div class="review content row">
+            <%= raw review.content %>
+          </div>
+          <div class="row">
+            <ul class="small-12 columns tiny button-group">
+              <% if review.access_privilege(current_user) %>
+                <li>
+                  <%= link_to 'Details', institution_program_review_path(review.institution, review.program, review), class: 'button small' %>
+                </li>
+                <li>
+                  <%= link_to 'edit',
+                  edit_institution_program_review_path(review.institution, review.program, review), class: 'button small' %>
+                </li>
+                <li>
+                  <%= link_to 'Delete',
+                  edit_institution_program_review_path(review.institution, review.program, review), method: :delete, class: 'button alert small' %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+        <div class="small-10 medium-10 large-1 columns"></div>
+      </div>
+      <hr>
+    <% end %>
+    <%= paginate @reviews %>
+  <% end %>

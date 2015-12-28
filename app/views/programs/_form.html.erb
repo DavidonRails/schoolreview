@@ -1,0 +1,7 @@
+<%= form_for [@institution, @program] do |f| %>
+
+  <%= f.label :title %>
+  <%= f.collection_select :title, Program.all, :title, :title %>
+
+  <%= f.submit 'Add your program', class: 'button tiny' %>
+<% end %>

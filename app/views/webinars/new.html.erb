@@ -1,0 +1,20 @@
+<div class="container padding">
+	<h1>New Webinar</h1>
+	<%= render 'form' %>
+
+	<div class="modal inmodal fade" id="createWebinarModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div style="background: white none repeat scroll 0 0; margin-left: auto; margin-right: auto;  margin-top: 200px; text-align: center; width: 94px;">
+			<img src="/assets/loading.gif">
+		</div>
+	</div>
+
+	<%= link_to 'Back', webinars_path,  :class => "button"%>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$(".webinar-create .button").click(function(){
+			$("#createWebinarModal").modal('show');
+		})
+	})
+</script>

@@ -1,0 +1,34 @@
+<div class="container padding">
+  <p id="notice"><%= notice %></p>
+
+  <p>
+    <strong>Name:</strong>
+    <%= @webinar.name %>
+  </p>
+
+  <p>
+    <strong>Video:</strong>
+    <br />
+    <%= video_tag @webinar.filepath, :size => "300x200", :controls => true %>
+  </p>
+
+  <p>
+    <strong>Participates:</strong>
+    <br />
+    <% participates = @webinar.participates %>
+    <% participates.each do |participate| %>
+    	<% if participate != "" %>
+  	  	<% participate_int = participate.to_i %>
+  	  	<p><%= User.find_by_id(participate_int).email %></p>
+    	<% end %>
+    <% end %>
+  </p>
+
+  <p>
+    <strong>User:</strong>
+    <%= @webinar.user.first_name %>
+  </p>
+
+  <%= link_to 'Edit', edit_webinar_path(@webinar) %> |
+  <%= link_to 'Back', webinars_path %>
+</div>

@@ -1,0 +1,12 @@
+<%= form_for @user_program_attendancy do |f| %>
+  <%= f.label :'select start date' %>
+  <%= date_select :user_program_attendancy, :start_date %>
+
+  <%= f.label :'select end date' %>
+  <%= date_select :user_program_attendancy, :end_date %>
+
+  <%= f.label :'Post your image or video url' %>
+  <%= f.text_field :url, placeholder: "provide an image or video link!" %>
+
+  <%= f.submit 'Submit', class: 'button tiny' %>
+<% end %>

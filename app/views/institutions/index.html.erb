@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+<div class="row">
+<h3 class="small-12 small-centered large-uncentered columns">Please choose the institution you are currently in:</h3>
+
+<table class="small-12 small-centered large-uncentered columns">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @institutions.each do |institution| %>
+      <tr>
+        <td><%= link_to institution.name, institution_path(institution) %></td>
+        <td><%= institution.description %></td>
+        <td><%= "#{institution.city},  #{institution.state},  #{institution.country}" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+
+  <%= paginate @institutions %>
+</table>
+
+<% if current_user %>
+  <% if current_user.admin == true %>
+  <div class="button round secondary">
+    <%= link_to 'add a new institution', new_institution_path %>
+  </div>
+  <% end %>
+<% end %>

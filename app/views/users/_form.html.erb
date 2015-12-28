@@ -1,0 +1,17 @@
+<%= form_for @user do |f| %>
+  <%= f.label :email %>
+  <%= f.text_field :email %>
+  <%= f.label :first_name %>
+  <%= f.text_field :first_name %>
+  <%= f.label :last_name %>
+  <%= f.text_field :last_name %>
+  <%= f.label :location %>
+  <%= f.text_field :location %>
+  <%= f.label :description %>
+  <%= f.text_area :description %>
+  <%= f.label :profile_photo %>
+  <%= f.file_field :profile_photo %>
+
+  <%= f.submit 'Accept Changes', class: 'small button' %>
+  <%= link_to 'Back', user_path(@user), class: 'small button' %>
+<% end %>

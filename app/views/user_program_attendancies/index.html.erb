@@ -1,0 +1,10 @@
+<h3>Program center</h3>
+<% @user_program_attendancies.each do |program| %>
+  <li>
+    <%= program.program.title %>
+    <%= link_to 'Edit', edit_user_program_attendancy_path(program) %>
+    <%= link_to 'Delete', {controller: :user_program_attendancies,
+                           action: 'destroy',
+                           id: program.id}, method: :delete %>
+  </li>
+<% end %>

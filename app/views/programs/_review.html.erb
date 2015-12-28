@@ -1,0 +1,85 @@
+<% @reviews.each do |review| %>
+  <div class="posts-feed-item row centered">
+    <div class="large-1 columns">
+      <ul>
+        <li>
+          <% if review.user.profile_photo.file %>
+            <p><%= image_tag review.user.profile_photo %></p>
+          <% else %>
+            <p><%= image_tag "#" %></p>
+          <% end %>
+        </li>
+        <li id="up-arrow-<%= review.id %>">
+          <%= link_to like_institution_program_review_path(review.institution, review.program, review), class: "upvote_review",
+           review: review.id, rating: review.rating,
+           institution: review.institution.id do %>
+            <i class="fi-arrow-up"></i>
+          <% end  %>
+        </li>
+        <li class="votetext update-rating-<%= review.id %>"><%= review.score %></li>
+        <li id="down-arrow-<%= review.id %>">
+          <%= link_to dislike_institution_program_review_path(review.institution, review.program, review), class: "downvote_review",
+           review: review.id, rating: review.rating,
+           institution: review.institution.id do%>
+             <i class="fi-arrow-down"></i>
+           <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="large-10 columns">
+      <div class="program target row">
+        <div class="large-8 columns">
+          <ul>
+            <li>
+              Institution: <%= link_to "#{review.institution.name}", institution_path(review.institution) %>
+            </li>
+            <li>
+              Program: <%= link_to "#{review.program.title}", institution_program_path(review.institution, review.program) %>
+            </li>
+          </ul>
+        </div>
+        <div class="large-4 columns">
+          <ul>
+            <li>
+              Created from: <%= distance_of_time_in_words(Time.now, review.created_at) %> ago
+            </li>
+            <li>
+              By: <%= review.user.first_name %>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="title row">
+        <div class="large-10 columns">
+          <%= link_to "#{review.title}", institution_program_review_path(review.institution, review.program, review) %>
+        </div>
+        <div class="large-2 columns">
+          Rating: <%= review.rating %>
+        </div>
+      </div>
+      <div class="review content row">
+        <%= raw review.content %>
+      </div>
+      <div class="row">
+        <ul class="small-12 columns small button-group">
+          <% if review.access_privilege(current_user) %>
+            <li>
+              <%= link_to 'Details', institution_program_review_path(review.institution, review.program, review), class: 'button small' %>
+            </li>
+            <li>
+              <%= link_to 'edit',
+              edit_institution_program_review_path(review.institution, review.program, review), class: 'button small' %>
+            </li>
+            <li>
+              <%= link_to 'Delete',
+              edit_institution_program_review_path(review.institution, review.program, review), method: :delete, class: 'button alert small' %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+    <div class="large-1 columns"></div>
+  </div>
+  <hr>
+<% end %>

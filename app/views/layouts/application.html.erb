@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LM int_edu</title>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= javascript_include_tag "vendor/modernizr" %>
+    <%= javascript_include_tag "application", 'data-turbolinks-track' => true %>
+    <%= csrf_meta_tags %>
+    <link title="timeline-styles" rel="stylesheet" href="//cdn.knightlab.com/libs/timeline3/latest/css/timeline.css">
+    <script src="//cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/89f2f44ba07ea3fff7e561c2142813b278c2d6c6/devicon.min.css">
+  </head>
+
+  <body>
+    <div class="sticky">
+      <nav class="top-bar" data-topbar role="navigation">
+        <ul class="title-area">
+          <li class="name">
+            <h1 id="topbar-logo"> <%= link_to 'Lightning Review', root_path %></h1>
+          </li>
+           <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+          <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+        </ul>
+        <section class="top-bar-section">
+          <!-- Right Nav Section -->
+          <ul class="right">
+
+            <li class="divider"></li>
+
+            <% if user_signed_in? %>
+
+              <li data-dropdown="msg_chat_dropdown" class="msg_chat_dropdown"  aria-controls="msg_chat_dropdown" aria-expanded="false" >
+                <a href="#" style="padding:0px; text-align:center;">
+                  <span class="glyphicon glyphicon-envelope" style="font-size:2.0em; padding-top : 8px;"></span>
+                  <span id="total-unread-msg" class="badge badge-warning" style="display:none;"></span>
+                </a>
+              </li>
+
+              <li class="active"><%= link_to "Signed in as #{current_user.first_name}", user_path(current_user), id: "#{current_user.id}" %></li>
+
+              <li><%= link_to 'Sign Out', destroy_user_session_path, method: :delete %></li>
+
+            <% else %>
+
+              <li><%= link_to 'Sign Up', new_user_registration_path %></li>
+
+              <li><%= link_to 'Sign In', new_user_session_path %></li>
+
+            <% end %>
+
+          </ul>
+
+          <ul id="msg_chat_dropdown" data-dropdown-content class="f-dropdown" aria-hidden="true">
+            <div  class="msg_chat_dropdown_list" style="width:200px;">
+            </div>
+          </ul>
+
+          <!-- Left Nav Section -->
+          <ul class="left small-6 columns" style="width:auto;">
+            <li><%= link_to 'Institutions', institutions_path %></li>
+            <li class="divider"></li>
+            <li>
+              <%= link_to 'Community', users_path %>
+            </li>
+            <li class="divider"></li>
+          </ul>
+        </section>
+      </nav>
+    </div>
+
+  <%- flash.each do |key, value| -%>
+    <div class="alert-box <%= key %> radius" id="layout-flash-box">
+      <%= value %>
+    </div>
+  <%- end -%>
+
+  <%= yield %>
+  
+  </body>
+</html>
